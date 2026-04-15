@@ -98,7 +98,7 @@ export function AdminDashboard() {
 
   const handleLogin = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (password === 'admin123') {
+    if (password === 'Okx@123000') {
       setIsAuthenticated(true);
       toast.success('Welcome back, Admin');
     } else {
