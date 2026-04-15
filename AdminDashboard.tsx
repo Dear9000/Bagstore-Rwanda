@@ -124,7 +124,7 @@ export function AdminDashboard() {
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Access Password</label>
                 <Input 
                   type="password" 
-                  placeholder="••••••••" 
+                  placeholder=".........." 
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   className="h-12 rounded-2xl border-primary/10 focus:ring-primary"
