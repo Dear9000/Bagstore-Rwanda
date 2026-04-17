@@ -5,7 +5,8 @@ import { Button } from './Button';
 import { Badge } from './Badge';
 import { formatPrice } from './utils';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
+//import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { ShoppingCart, ArrowRight } from 'lucide-react';
 
 interface ProductCardProps {
