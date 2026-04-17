@@ -1,4 +1,4 @@
-import express from 'express';
+/*import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
@@ -16,7 +16,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-async function startServer() {
+/*async function startServer() {
   const app = express();
   const PORT = 3000;
 
@@ -370,17 +370,17 @@ if (isDev) {
 
   app.use(vite.middlewares);
 }
-*/
+
 
   
   
-  /*if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
+  if (process.env.NODE_ENV !== 'production') {
+    /*const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
-  }*/ else {
+  } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use('/api', apiRouter);
     //app.use(express.static(distPath));
@@ -399,7 +399,7 @@ if (isDev) {
 
   
   });
-}*/
+}
   try {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
@@ -412,6 +412,113 @@ if (isDev) {
 
   
 
+startServer().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});*/
+
+import express from 'express';
+import cors from 'cors';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { createServer as createViteServer } from 'vite';
+import db from './db.ts';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ensure upload directory exists
+const uploadDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+async function startServer() {
+  const app = express();
+  const PORT = process.env.PORT || 3000;
+
+  app.use(cors());
+  app.use(express.json());
+  app.use('/uploads', express.static(uploadDir));
+
+  // Multer setup
+  const storage = multer.diskStorage({
+    destination: (_, __, cb) => cb(null, uploadDir),
+    filename: (_, file, cb) => {
+      const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, unique + path.extname(file.originalname));
+    }
+  });
+
+  const upload = multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }
+  });
+
+  // ================= API =================
+
+  app.get('/api/products', (req, res) => {
+    try {
+      const products = db.prepare('SELECT * FROM products').all();
+      res.json(products.map((p: any) => ({
+        ...p,
+        images: p.images ? JSON.parse(p.images) : []
+      })));
+    } catch (e) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/products', upload.array('images'), (req: any, res) => {
+    try {
+      const { name, category, description } = req.body;
+      const price = parseFloat(req.body.price) || 0;
+      const cost_price = parseFloat(req.body.cost_price) || 0;
+      const stock = parseInt(req.body.stock) || 0;
+
+      const images = (req.files || []).map((f: any) => `/uploads/${f.filename}`);
+
+      const result = db.prepare(`
+        INSERT INTO products (name, category, price, cost_price, description, images, stock)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(name, category, price, cost_price, description, JSON.stringify(images), stock);
+
+      res.json({ id: result.lastInsertRowid });
+    } catch (e) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // ================= VITE / PRODUCTION =================
+
+  const isDev = process.env.NODE_ENV !== 'production';
+
+  if (isDev) {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
+    });
+
+    app.use(vite.middlewares);
+  } else {
+    const distPath = path.join(process.cwd(), 'dist');
+    app.use(express.static(distPath));
+
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+  }
+
+  // ================= START SERVER =================
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// start
 startServer().catch(err => {
   console.error('Failed to start server:', err);
   process.exit(1);
