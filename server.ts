@@ -348,7 +348,7 @@ async function startServer() {
 async function startServer() {
   const app = express();
 
-  if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -359,8 +359,20 @@ async function startServer() {
 
   app.listen(3000);
 }
+/*------mychange------
+const isDev = process.env.NODE_ENV !== 'production';
 
+if (isDev) {
+  const vite = await createViteServer({
+    server: { middlewareMode: true },
+    appType: 'spa',
+  });
 
+  app.use(vite.middlewares);
+}
+*/
+
+  
   
   /*if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
@@ -370,16 +382,35 @@ async function startServer() {
     app.use(vite.middlewares);
   }*/ else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    app.use('/api', apiRouter);
+    //app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
+      
     });
   }
+  
 
+
+
+  
+  /*app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+
+  
+  });
+}*/
+  try {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
+} catch (err) {
+  console.error('Server failed to start:', err);
 }
+
+
+
+  
 
 startServer().catch(err => {
   console.error('Failed to start server:', err);
