@@ -91,7 +91,8 @@ export function ProductPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.5 }}
-                src={product.images[selectedImage]}
+                //src={product.images[selectedImage]}
+                src={ product.images?.[selectedImage] || 'https://picsum.photos/seed/bag/800/1000'}
                 alt={product.name}
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
