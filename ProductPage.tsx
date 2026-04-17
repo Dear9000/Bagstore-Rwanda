@@ -236,7 +236,8 @@ export function ProductPage() {
                     placeholder="Enter your name"
                     className="h-12 rounded-2xl border-primary/10 focus:ring-primary"
                     value={orderData.name}
-                    onChange={e => setOrderData({...orderData, name: e.target.value})}
+                    //onChange={e => setOrderData({...orderData, name: e.target.value})}
+                    onChange={e =>setOrderData({  ...orderData, quantity: Number(e.target.value) || 1  })}
                   />
                 </div>
                 <div className="space-y-2">
