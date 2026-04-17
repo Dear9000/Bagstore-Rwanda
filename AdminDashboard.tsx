@@ -1,7 +1,4 @@
-addIncome(...)
-createIncome(...)
-fetch('/api/income', ...)
-axios.post('/api/income', ...)
+
 
 
 import React, { useEffect, useState } from 'react';
