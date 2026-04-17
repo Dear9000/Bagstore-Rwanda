@@ -1,3 +1,9 @@
+addIncome(...)
+createIncome(...)
+fetch('/api/income', ...)
+axios.post('/api/income', ...)
+
+
 import React, { useEffect, useState } from 'react';
 import { Product, Order, StockMovement, Analytics, Expense, Income, LedgerSummary } from './types';
 import { api } from './api';
