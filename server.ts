@@ -345,13 +345,30 @@ async function startServer() {
   });
 
   // Vite middleware for development
+async function startServer() {
+  const app = express();
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
+
     app.use(vite.middlewares);
-  } else {
+  }
+
+  app.listen(3000);
+}
+
+
+  
+  /*if (process.env.NODE_ENV !== 'production') {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
+    });
+    app.use(vite.middlewares);
+  }*/ else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
